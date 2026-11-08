@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--
+  CircuitLab 3D — Breadboard Lab page
+  Built from template/lab-template.html. Board id: breadboard.
+  The stage is a full-size solderless breadboard with an Arduino Uno
+  beside it (engine.js wires the Uno's pins as the wiring anchors).
+  Data: ../data/pins-breadboard.js  -> window.PIN_SETS['breadboard']   (landmarks)
+        ../data/lessons-breadboard.js -> window.LESSON_SETS['breadboard']
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breadboard Lab · CircuitLab 3D</title>
+<meta name="description" content="Explore the Breadboard Lab in interactive 3D: every landmark explained, guided wiring lessons, and a runnable simulation. Part of CircuitLab 3D, a free electronics lab for ECE students.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/lab.css">
+<!-- Per-page accent colour (matches this board's hub card). -->
+<style>:root{ --acc:#fde047; }</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ================= LEFT: header card + info panel ================= -->
+  <div class="col-left">
+
+    <header class="hud-top glass">
+      <a class="back" href="../">← CircuitLab</a>
+      <div class="title-block">
+        <h1>Breadboard Lab</h1>
+        <p class="subtitle">Solderless circuits, rails &amp; tie-points</p>
+      </div>
+      <ul class="spec-list" id="spec-list">
+        <li><span class="k">Tie-points</span><span class="v">830</span></li>
+        <li><span class="k">Power rails</span><span class="v">Dual (+ / −)</span></li>
+        <li><span class="k">Centre groove</span><span class="v">For DIP chips</span></li>
+        <li><span class="k">Layout</span><span class="v">Rows 1–30 · columns A–E / F–J</span></li>
+        <li><span class="k">Pairs with</span><span class="v">The Uno beside it</span></li>
+      </ul>
+    </header>
+
+    <section id="panel" class="glass" aria-live="polite">
+      <div id="panel-content">
+        <p class="panel-kicker">Welcome</p>
+        <h2>Breadboard Lab</h2>
+        <p class="p-hook">Pick a lesson on the right, or explore the landmarks to learn how a breadboard is secretly wired.</p>
+        <p class="p-desc">Drag to orbit the board, scroll to zoom, and use the Lessons / Landmarks tabs to explore. When a lesson is selected, follow its wiring table and press Run simulation to see the circuit work.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ================= CENTER: 3D stage only ================= -->
+  <div class="col-center">
+    <div id="stage" aria-label="Interactive 3D breadboard view"></div>
+
+    <div id="labels" aria-hidden="true"><!-- .lbl elements positioned by main.js --></div>
+
+    <div id="tooltip" hidden></div>
+
+    <p id="hint">Drag to orbit · Scroll to zoom · Pick a lesson or a landmark</p>
+
+    <!-- Serial monitor: collapsible sheet docked to the bottom of the stage -->
+    <section id="serial" class="collapsed" aria-label="Serial monitor">
+      <div class="serial-head">
+        <span id="serial-title">Serial monitor</span>
+        <span class="serial-status" id="serial-status">Stopped</span>
+        <span class="spacer"></span>
+        <button class="serial-btn" id="btn-serial-clear" type="button">Clear</button>
+        <button class="serial-btn" id="btn-serial-toggle" type="button" aria-expanded="false">Show</button>
+      </div>
+      <div id="serial-body" tabindex="0"></div>
+    </section>
+  </div>
+
+  <!-- ================= RIGHT: switcher + controls ================= -->
+  <div class="col-right">
+
+    <section class="switcher glass" aria-label="Lessons and landmarks">
+      <h2>Explore</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-lessons" type="button" role="tab" aria-selected="true">Lessons</button>
+        <button class="tab" id="tab-pins" type="button" role="tab" aria-selected="false">Landmarks</button>
+      </div>
+      <input id="search" type="search" placeholder="Search lessons or landmarks…" autocomplete="off">
+      <div id="list" role="listbox" aria-label="Results">
+        <!-- main.js renders .list-group headers and .item buttons here -->
+      </div>
+    </section>
+
+    <section class="controls glass" aria-label="Simulation controls">
+      <h2>Simulation</h2>
+      <button class="ctl" id="btn-run" type="button">▶ Run simulation</button>
+      <div class="ctl-row">
+        <button class="ctl" id="btn-stop" type="button" disabled>■ Stop</button>
+        <button class="ctl" id="btn-reset-view" type="button">Reset view</button>
+      </div>
+      <div class="ctl-row">
+        <button class="ctl" id="tgl-labels" type="button" aria-pressed="true">Labels</button>
+        <button class="ctl" id="tgl-rotate" type="button" aria-pressed="false">Auto-rotate</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div id="loading">
+  <div class="load-inner">
+    <p class="load-word">Circuit<b>Lab</b> 3D</p>
+    <div class="load-bar" aria-hidden="true"></div>
+    <p class="load-msg">Warming up the workbench…</p>
+  </div>
+</div>
+
+<!-- WebGL failure overlay (keep the [hidden] guard in lab.css intact) -->
+<div id="webgl-fail" hidden>
+  <div class="fail-card glass">
+    <h2>WebGL isn’t available</h2>
+    <p>CircuitLab 3D needs WebGL to render the boards in 3D. Try a recent version of Chrome, Edge, Firefox or Safari, and make sure hardware acceleration is turned on.</p>
+    <p><a href="../">← Back to CircuitLab home</a></p>
+  </div>
+</div>
+
+<!-- Board data: classic scripts, MUST load before the modules below.
+     pins-breadboard.js    defines window.PIN_SETS['breadboard']    (landmarks)
+     lessons-breadboard.js defines window.LESSON_SETS['breadboard'] -->
+<script src="../data/pins-breadboard.js"></script>
+<script src="../data/lessons-breadboard.js"></script>
+
+<!-- Shared 3D builders + simulation engine (modules) -->
+<script type="module" src="../js/boards3d.js"></script>
+<script type="module" src="../js/engine.js"></script>
+
+<!-- This page's boot code: hands the breadboard data set to the shared engine. -->
+<script type="module" src="./js/main.js"></script>
+
+</body>
+</html>

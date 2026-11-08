@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!--
+  CircuitLab 3D — LAB PAGE TEMPLATE
+  =================================
+  Copy this file into a board folder (uno/, nano/, mega/, esp32/, pico/, pi4/, breadboard/)
+  as index.html, then:
+    1. Replace every BOARDID token with the board id (uno | nano | mega | esp32 | pico | pi4 | breadboard).
+    2. Set the per-page accent: change --acc in the inline <style> in <head>.
+    3. Fill the header card (h1, subtitle, spec list) with the board's real specs.
+    4. Make sure these files exist:
+         ../css/lab.css                 (shared stylesheet)
+         ../js/boards3d.js              (module: procedural 3D board builders)
+         ../js/engine.js                (module: wiring + simulation engine)
+         ../data/pins-esp32.js        (classic script: defines window.PINS_BOARDID)
+         ../data/lessons-esp32.js     (classic script: defines window.LESSONS_BOARDID)
+         ./js/main.js                   (module: this page's boot + UI wiring)
+  DO NOT rename any id below — js/engine.js and every main.js rely on this contract.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP32 DevKit · CircuitLab 3D</title>
+<meta name="description" content="Explore the ESP32 DevKit in interactive 3D: every pin explained, guided wiring lessons, and a runnable simulation. Part of CircuitLab 3D, a free electronics lab for ECE students.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/lab.css">
+<!-- Per-page accent colour (matches this board's hub card). Override per board. -->
+<style>:root{ --acc:#fbbf24; }</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ================= LEFT: header card + info panel ================= -->
+  <div class="col-left">
+
+    <header class="hud-top glass">
+      <a class="back" href="../">← CircuitLab</a>
+      <div class="title-block">
+        <h1>ESP32 DevKit</h1>
+        <p class="subtitle">ESP32 · Espressif DevKit V1</p>
+      </div>
+      <ul class="spec-list" id="spec-list">
+        <li><span class="k">Chip</span><span class="v">Dual-core Xtensa · 240 MHz</span></li>
+        <li><span class="k">Logic level</span><span class="v">3.3 V logic — not 5 V tolerant</span></li>
+        <li><span class="k">Wireless</span><span class="v">Wi-Fi + Bluetooth/BLE</span></li>
+        <li><span class="k">GPIO</span><span class="v">34 GPIO · ADC · DAC · touch</span></li>
+        <li><span class="k">Connector</span><span class="v">Micro-USB</span></li>
+      </ul>
+    </header>
+
+    <section id="panel" class="glass" aria-live="polite">
+      <div id="panel-content">
+        <!-- main.js renders one of:
+             · pin view:    .panel-kicker, h2, .p-hook, dl.p-stats, .p-desc, .p-fact
+             · lesson view: .panel-kicker, h2, .p-hook, ol.p-steps, .wire-table,
+                            .codeblock (with .code-copy button), .p-fact
+             Add class "panel-in" to #panel-content after each render for the pulse. -->
+        <p class="panel-kicker">Welcome</p>
+        <h2>ESP32 DevKit</h2>
+        <p class="p-hook">Pick a lesson on the right, or click any pin on the board to learn what it does.</p>
+        <p class="p-desc">Drag to orbit the board, scroll to zoom, and use the Lessons / Pins tabs to explore. When a lesson is selected, follow its wiring table and press Run simulation to see the circuit work.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ================= CENTER: 3D stage only ================= -->
+  <div class="col-center">
+    <div id="stage" aria-label="Interactive 3D board view"></div>
+
+    <div id="labels" aria-hidden="true"><!-- .lbl elements positioned by main.js --></div>
+
+    <div id="tooltip" hidden></div>
+
+    <p id="hint">Drag to orbit · Scroll to zoom · Pick a lesson or a pin</p>
+
+    <!-- Serial monitor: collapsible sheet docked to the bottom of the stage -->
+    <section id="serial" class="collapsed" aria-label="Serial monitor">
+      <div class="serial-head">
+        <span id="serial-title">Serial monitor</span>
+        <span class="serial-status" id="serial-status">Stopped</span>
+        <span class="spacer"></span>
+        <button class="serial-btn" id="btn-serial-clear" type="button">Clear</button>
+        <button class="serial-btn" id="btn-serial-toggle" type="button" aria-expanded="false">Show</button>
+      </div>
+      <div id="serial-body" tabindex="0"></div>
+    </section>
+  </div>
+
+  <!-- ================= RIGHT: switcher + controls ================= -->
+  <div class="col-right">
+
+    <section class="switcher glass" aria-label="Lessons and pins">
+      <h2>Explore</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-lessons" type="button" role="tab" aria-selected="true">Lessons</button>
+        <button class="tab" id="tab-pins" type="button" role="tab" aria-selected="false">Pins</button>
+      </div>
+      <input id="search" type="search" placeholder="Search lessons or pins…" autocomplete="off">
+      <div id="list" role="listbox" aria-label="Results">
+        <!-- main.js renders .list-group headers and .item buttons here -->
+      </div>
+    </section>
+
+    <section class="controls glass" aria-label="Simulation controls">
+      <h2>Simulation</h2>
+      <button class="ctl" id="btn-run" type="button">▶ Run simulation</button>
+      <div class="ctl-row">
+        <button class="ctl" id="btn-stop" type="button" disabled>■ Stop</button>
+        <button class="ctl" id="btn-reset-view" type="button">Reset view</button>
+      </div>
+      <div class="ctl-row">
+        <button class="ctl" id="tgl-labels" type="button" aria-pressed="true">Labels</button>
+        <button class="ctl" id="tgl-rotate" type="button" aria-pressed="false">Auto-rotate</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div id="loading">
+  <div class="load-inner">
+    <p class="load-word">Circuit<b>Lab</b> 3D</p>
+    <div class="load-bar" aria-hidden="true"></div>
+    <p class="load-msg">Warming up the workbench…</p>
+  </div>
+</div>
+
+<!-- WebGL failure overlay (keep the [hidden] guard in lab.css intact) -->
+<div id="webgl-fail" hidden>
+  <div class="fail-card glass">
+    <h2>WebGL isn’t available</h2>
+    <p>CircuitLab 3D needs WebGL to render the boards in 3D. Try a recent version of Chrome, Edge, Firefox or Safari, and make sure hardware acceleration is turned on.</p>
+    <p><a href="../">← Back to CircuitLab home</a></p>
+  </div>
+</div>
+
+<!-- Board data: classic scripts, MUST load before the modules below.
+     Each defines one window global: PINS_BOARDID / LESSONS_BOARDID. -->
+<script src="../data/pins-esp32.js"></script>
+<script src="../data/lessons-esp32.js"></script>
+
+<!-- Shared 3D builders + simulation engine (modules) -->
+<script type="module" src="../js/boards3d.js"></script>
+<script type="module" src="../js/engine.js"></script>
+
+<!-- This page's boot code.
+     main.js is expected to finish with a call shaped like:
+       initLab({
+         board: 'BOARDID',
+         pins: window.PINS_BOARDID,
+         lessons: window.LESSONS_BOARDID
+       });
+     (initLab is exported by ../js/engine.js; boards3d.js provides the board mesh.) -->
+<script type="module" src="./js/main.js"></script>
+
+</body>
+</html>
