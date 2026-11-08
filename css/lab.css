@@ -1,8 +1,8 @@
 /* CircuitLab 3D — shared lab stylesheet.
    One design system for every lab page: three-section layout
-   (LEFT data · CENTER 3D stage · RIGHT switcher/controls), glass
-   surfaces, pill controls, and a per-page accent colour in --acc.
-   Original CSS, written for this project. */
+   (LEFT navigator · CENTER workbench stage · RIGHT controls + lesson
+   panel), glass surfaces, pill controls, and a per-page accent colour
+   in --acc. Original CSS, written for this project. */
 
 :root {
   --acc: #ffd166;                                  /* per-page accent — each lab overrides this */
@@ -44,12 +44,13 @@ button, input { font: inherit; }
 #panel::-webkit-scrollbar-thumb:hover, #list::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.28); }
 
 /* ================= three-section layout =================
-   LEFT data · CENTER stage · RIGHT switcher/options.
-   Side columns are real layout (not overlays), so the canvas
-   fills the centre column only and the board sits dead-centre. */
+   LEFT navigator (header + lessons/pins) · CENTER workbench stage ·
+   RIGHT controls + lesson panel. Side columns are real layout (not
+   overlays), so the canvas fills the centre column only and the board
+   sits dead-centre. */
 .layout {
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr) 340px;
+  grid-template-columns: 340px minmax(0, 1fr) 360px;
   height: 100vh;
   height: 100dvh;
 }
@@ -60,7 +61,16 @@ button, input { font: inherit; }
 }
 .col-left  { border-right: 1px solid var(--line); }
 .col-right { border-left:  1px solid var(--line); }
-.col-center { position: relative; min-width: 0; overflow: hidden; }
+.col-center {
+  position: relative; min-width: 0; overflow: hidden;
+  /* Warm workbench backdrop: a soft spotlight pool behind the board
+     over deep charcoal-brown edges (the canvas paints over the middle;
+     this frames the stage and shows through while the scene loads). */
+  background:
+    radial-gradient(90% 62% at 50% 34%, rgba(255, 176, 102, .16), transparent 62%),
+    radial-gradient(150% 115% at 50% 42%, #251a11 0%, #17100a 56%, #0c0705 100%);
+  background-color: #14100c;
+}
 
 /* ================= shared glass surface ================= */
 .glass {
@@ -99,7 +109,7 @@ button, input { font: inherit; }
 .spec-list .k { color: var(--muted); font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; padding-top: 2px; }
 .spec-list .v { color: var(--ink); font-weight: 500; text-align: right; }
 
-/* ================= left column: info panel ================= */
+/* ================= lesson panel (right column, below controls) ================= */
 #panel {
   position: relative; flex: 1; min-height: 0; overflow-y: auto;
   padding: 20px 22px;
@@ -181,10 +191,10 @@ button, input { font: inherit; }
 #stage { position: absolute; inset: 0; }
 #stage canvas { display: block; width: 100%; height: 100%; cursor: grab; }
 #stage canvas:active { cursor: grabbing; }
-/* Cinematic vignette over the stage, below labels/tooltip/hint */
+/* Warm cinematic vignette over the stage, below labels/tooltip/hint */
 .col-center::after {
   content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,.38));
+  background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(20,12,6,.45));
 }
 
 /* Floating pin/part labels */
@@ -257,7 +267,7 @@ button, input { font: inherit; }
 #serial-body .sys { color: #7d8aa8; }
 #serial-body .err { color: #ff8a7a; }
 
-/* ================= right column: switcher ================= */
+/* ================= switcher / navigator (left column) ================= */
 .switcher { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 14px; }
 .switcher h2 {
   margin: 2px 2px 10px; font-size: 11px; font-weight: 600;
@@ -307,6 +317,19 @@ button, input { font: inherit; }
 .item .meta { margin-left: auto; color: var(--dim); font-size: .7rem; letter-spacing: .04em; white-space: nowrap; }
 .item .sub { display: block; color: var(--dim); font-size: .68rem; margin-top: 1px; }
 .list-empty { color: var(--muted); font-size: .85rem; padding: 12px 6px; }
+
+/* Lesson numbering: in the Lessons tab only, rows carry a small mono
+   step number (01, 02, …) in the board accent, like the reference app.
+   Scoped via :has on the active Lessons tab, so Pins rows stay clean;
+   browsers without :has simply show no numbers. */
+.switcher:has(#tab-lessons.active) #list { counter-reset: lesson-num; }
+.switcher:has(#tab-lessons.active) #list .item { counter-increment: lesson-num; }
+.switcher:has(#tab-lessons.active) #list .item::before {
+  content: counter(lesson-num, decimal-leading-zero);
+  flex: none; min-width: 21px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--acc);
+}
 
 /* ================= right column: controls ================= */
 .controls { flex: none; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
@@ -389,7 +412,7 @@ button, input { font: inherit; }
 
 /* ================= tablet ================= */
 @media (max-width: 1023px) {
-  .layout { grid-template-columns: 272px minmax(0, 1fr) 272px; }
+  .layout { grid-template-columns: 272px minmax(0, 1fr) 300px; }
   .col-left, .col-right { padding: 14px; gap: 12px; }
   .spec-list { display: none; }
   #panel { padding: 16px 18px; }
@@ -397,7 +420,7 @@ button, input { font: inherit; }
 }
 
 /* ================= mobile: single scrolling column =================
-   header → stage block (56vh, unobstructed) → switcher → panel → controls.
+   header → stage block (56vh, unobstructed) → controls → switcher → panel.
    The side columns dissolve (display:contents) so their cards join
    this single flow in the established order. */
 @media (max-width: 640px) {
@@ -408,10 +431,10 @@ button, input { font: inherit; }
   .title-block h1 { font-size: 1.4rem; }
   .subtitle { display: none; }
   .col-center { order: 2; flex: none; width: 100%; height: 56vh; margin-top: 12px; }
-  .switcher { order: 3; flex: none; margin: 12px 12px 0; }
+  .controls { order: 3; margin: 12px 12px 0; }
+  .switcher { order: 4; flex: none; margin: 12px 12px 0; }
   .switcher #list { flex: none; max-height: 30vh; }
-  #panel { order: 4; flex: none; margin: 12px 12px 0; padding: 16px 18px; overflow-y: visible; }
-  .controls { order: 5; margin: 12px 12px 12px; }
+  #panel { order: 5; flex: none; margin: 12px 12px 12px; padding: 16px 18px; overflow-y: visible; }
   #hint { display: none; }
   #serial { left: 8px; right: 8px; bottom: 8px; }
   #serial-body { height: 110px; }

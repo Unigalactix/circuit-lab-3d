@@ -85,7 +85,7 @@ export function initLab(config) {
 
   const ground = new THREE.Mesh(
     new THREE.CircleGeometry(30, 48),
-    new THREE.MeshStandardMaterial({ color: 0x0b0e18, roughness: 1, metalness: 0 })
+    new THREE.MeshStandardMaterial({ color: 0x171310, roughness: 1, metalness: 0 })
   );
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.14;
@@ -137,9 +137,9 @@ export function initLab(config) {
 
   // camera home, framed on the anchor board + breadboard
   const boardSize = anchorSource.userData.size || { w: 7, d: 5 };
-  const homeDist = Math.max(boardSize.w, boardSize.d) * 2.1 + 7;
-  const homeTarget = new THREE.Vector3(anchorSource.position.x + 1.2, 0, 0.4);
-  if (boardId === 'breadboard') homeTarget.set(-5.2, 0, 0); // frame Uno + main breadboard together
+  const homeDist = (Math.max(boardSize.w, boardSize.d) * 2.1 + 7) * 0.85;
+  const homeTarget = new THREE.Vector3(anchorSource.position.x + 1.2, 0.5, 0.4);
+  if (boardId === 'breadboard') homeTarget.set(-5.2, 0.5, 0); // frame Uno + main breadboard together
   const homePos = homeTarget.clone().add(new THREE.Vector3(homeDist * 0.55, homeDist * 0.62, homeDist * 0.72));
   camera.position.copy(homePos);
   controls.target.copy(homeTarget);

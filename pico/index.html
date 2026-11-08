@@ -41,7 +41,7 @@
 
 <div class="layout">
 
-  <!-- ================= LEFT: header card + info panel ================= -->
+  <!-- ================= LEFT: header card + navigator ================= -->
   <div class="col-left">
 
     <header class="hud-top glass">
@@ -59,17 +59,15 @@
       </ul>
     </header>
 
-    <section id="panel" class="glass" aria-live="polite">
-      <div id="panel-content">
-        <!-- main.js renders one of:
-             · pin view:    .panel-kicker, h2, .p-hook, dl.p-stats, .p-desc, .p-fact
-             · lesson view: .panel-kicker, h2, .p-hook, ol.p-steps, .wire-table,
-                            .codeblock (with .code-copy button), .p-fact
-             Add class "panel-in" to #panel-content after each render for the pulse. -->
-        <p class="panel-kicker">Welcome</p>
-        <h2>Raspberry Pi Pico</h2>
-        <p class="p-hook">Pick a lesson on the right, or click any pin on the board to learn what it does.</p>
-        <p class="p-desc">Drag to orbit the board, scroll to zoom, and use the Lessons / Pins tabs to explore. When a lesson is selected, follow its wiring table and press Run simulation to see the circuit work.</p>
+    <section class="switcher glass" aria-label="Lessons and pins">
+      <h2>Explore</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-lessons" type="button" role="tab" aria-selected="true">Lessons</button>
+        <button class="tab" id="tab-pins" type="button" role="tab" aria-selected="false">Pins</button>
+      </div>
+      <input id="search" type="search" placeholder="Search lessons or pins…" autocomplete="off">
+      <div id="list" role="listbox" aria-label="Results">
+        <!-- main.js renders .list-group headers and .item buttons here -->
       </div>
     </section>
 
@@ -98,20 +96,8 @@
     </section>
   </div>
 
-  <!-- ================= RIGHT: switcher + controls ================= -->
+  <!-- ================= RIGHT: controls + lesson panel ================= -->
   <div class="col-right">
-
-    <section class="switcher glass" aria-label="Lessons and pins">
-      <h2>Explore</h2>
-      <div class="tabs" role="tablist">
-        <button class="tab active" id="tab-lessons" type="button" role="tab" aria-selected="true">Lessons</button>
-        <button class="tab" id="tab-pins" type="button" role="tab" aria-selected="false">Pins</button>
-      </div>
-      <input id="search" type="search" placeholder="Search lessons or pins…" autocomplete="off">
-      <div id="list" role="listbox" aria-label="Results">
-        <!-- main.js renders .list-group headers and .item buttons here -->
-      </div>
-    </section>
 
     <section class="controls glass" aria-label="Simulation controls">
       <h2>Simulation</h2>
@@ -123,6 +109,20 @@
       <div class="ctl-row">
         <button class="ctl" id="tgl-labels" type="button" aria-pressed="true">Labels</button>
         <button class="ctl" id="tgl-rotate" type="button" aria-pressed="false">Auto-rotate</button>
+      </div>
+    </section>
+
+    <section id="panel" class="glass" aria-live="polite">
+      <div id="panel-content">
+        <!-- main.js renders one of:
+             · pin view:    .panel-kicker, h2, .p-hook, dl.p-stats, .p-desc, .p-fact
+             · lesson view: .panel-kicker, h2, .p-hook, ol.p-steps, .wire-table,
+                            .codeblock (with .code-copy button), .p-fact
+             Add class "panel-in" to #panel-content after each render for the pulse. -->
+        <p class="panel-kicker">Welcome</p>
+        <h2>Raspberry Pi Pico</h2>
+        <p class="p-hook">Pick a lesson on the left, or click any pin on the board to learn what it does.</p>
+        <p class="p-desc">Drag to orbit the board, scroll to zoom, and use the Lessons / Pins tabs to explore. When a lesson is selected, follow its wiring table and press Run simulation to see the circuit work.</p>
       </div>
     </section>
 
