@@ -23,9 +23,9 @@ function injectLabelStyles() {
     .cl3d-labels { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:5; }
     .cl3d-label { position:absolute; left:0; top:0; transform:translate(-50%,-160%);
       padding:2px 8px; border-radius:999px; font:600 11px/1.5 Inter, system-ui, sans-serif;
-      letter-spacing:.04em; color:#eef2ff; background:rgba(9,12,22,.78);
-      border:1px solid rgba(255,255,255,.14); white-space:nowrap; will-change:transform; }
-    .cl3d-label.power { color:#ffd166; }
+      letter-spacing:.01em; color:#faf4e8; background:#2c2015;
+      border:1px solid rgba(44,32,21,.55); white-space:nowrap; will-change:transform; }
+    .cl3d-label.power { color:#f2a65a; }
   `;
   document.head.appendChild(st);
 }
@@ -85,7 +85,7 @@ export function initLab(config) {
 
   const ground = new THREE.Mesh(
     new THREE.CircleGeometry(30, 48),
-    new THREE.MeshStandardMaterial({ color: 0x171310, roughness: 1, metalness: 0 })
+    new THREE.MeshStandardMaterial({ color: 0xa08c66, roughness: 1, metalness: 0 })
   );
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.14;
@@ -240,12 +240,12 @@ export function initLab(config) {
     const wires = (lesson.wiring || []).map((w) =>
       `<tr><td><code>${esc(w.from)}</code></td><td>→</td><td><code>${esc(w.to)}</code></td></tr>`).join('');
     panelEl.innerHTML = `
-      <p class="panel-kicker">Lesson ${idx + 1} · ${esc(lesson.level || '')} · ${esc(lesson.mins ?? '')} min</p>
+      <p class="panel-kicker">Lesson ${idx + 1} / ${esc(lesson.level || '')} / ${esc(lesson.mins ?? '')} min</p>
       <h2>${esc(lesson.title)}</h2>
       ${lesson.goal ? `<p class="p-tag">${esc(lesson.goal)}</p>` : ''}
       ${parts ? `<h3 class="panel-h3">You will need</h3><ul class="p-parts">${parts}</ul>` : ''}
       ${wires ? `<h3 class="panel-h3">Wiring</h3><table class="wire-table"><tbody>${wires}</tbody></table>` : ''}
-      ${showCode ? `<h3 class="panel-h3">Code · ${esc(lesson.codeLang || 'Arduino C++')}</h3>
+      ${showCode ? `<h3 class="panel-h3">Code / ${esc(lesson.codeLang || 'Arduino C++')}</h3>
       <div class="code-wrap"><button type="button" class="copy-btn" data-copy>Copy code</button><pre class="code-block"><code>${esc(lesson.code || '')}</code></pre></div>` : ''}
       <p class="p-desc">${esc(lesson.explain || '')}</p>
       ${lesson.watch ? `<div class="p-fact"><strong>Watch for:</strong> ${esc(lesson.watch)}</div>` : ''}
@@ -272,7 +272,7 @@ export function initLab(config) {
       ? 'This pin is highlighted on the board — look for the pulsing ring.'
       : (isBb ? '' : 'This pin is not broken out as a header anchor on the 3D model.');
     panelEl.innerHTML = `
-      <p class="panel-kicker">${isBb ? 'Breadboard landmark' : `Pin reference · ${esc(anchorSource.userData.boardName || boardId)}`}</p>
+      <p class="panel-kicker">${isBb ? 'Breadboard landmark' : `Pin reference / ${esc(anchorSource.userData.boardName || boardId)}`}</p>
       <h2>${esc(pin.name)}</h2>
       <p class="p-tag">${esc(pin.type || '')}</p>
       <p class="p-desc">${esc(pin.desc || '')}</p>
@@ -448,7 +448,7 @@ export function initLab(config) {
     setSerialOpen(true);
     setSerialStatus('Running', true);
     serialClear();
-    serialPrint(`CircuitLab 3D · ${anchorSource.userData.boardName || boardId} ready`);
+    serialPrint(`CircuitLab 3D / ${anchorSource.userData.boardName || boardId} ready`);
     serialPrint(`> Running: ${lesson.title}`);
     const mode = lesson.sim && lesson.sim.mode;
     if (mode === 'lcd-text' && simComp) {

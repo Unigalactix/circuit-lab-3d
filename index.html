@@ -3,20 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CircuitLab 3D — Learn Arduino, Breadboards &amp; Raspberry Pi in Interactive 3D</title>
+<title>CircuitLab 3D: Learn Arduino, Breadboards &amp; Raspberry Pi in Interactive 3D</title>
 <meta name="description" content="CircuitLab 3D is a free, original electronics lab for ECE students: explore Arduino, ESP32 and Raspberry Pi boards in interactive 3D, wire real circuits on a virtual breadboard, and run lesson simulations in your browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#eef1ff;
-    --dim:#98a2c8;
-    --gold:#ffd166;
-    --gold-deep:#c77f2a;
-    --bg:#05070f;
-    --panel:rgba(13,17,30,.82);
-    --line:rgba(255,255,255,.08);
+    --ink:#2c2015;
+    --dim:#7d6c57;
+    --soft:#5d4c36;
+    --gold:#b85c33;        /* clay — primary accent */
+    --gold-deep:#96502c;
+    --bg:#f1e8d8;
+    --panel:#faf4e8;
+    --panel-alt:#f5eddc;
+    --line:#d9c9a8;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
@@ -25,18 +27,18 @@
     font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  /* Backdrop: deep-space gradient + faint circuit grid drawn with CSS only */
+  /* Backdrop: warm paper + faint circuit grid drawn with CSS only */
   .backdrop{
     position:fixed; inset:0; z-index:-1; pointer-events:none;
     background:
-      radial-gradient(1100px 600px at 50% -10%, rgba(255,209,102,.10), transparent 60%),
-      radial-gradient(900px 700px at 85% 110%, rgba(125,180,255,.08), transparent 60%),
-      linear-gradient(rgba(140,165,255,.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(140,165,255,.05) 1px, transparent 1px),
-      radial-gradient(ellipse at 50% 35%, #0a1030 0%, #05070f 72%);
+      radial-gradient(1100px 600px at 50% -10%, rgba(184,92,51,.12), transparent 60%),
+      radial-gradient(900px 700px at 85% 110%, rgba(160,140,102,.14), transparent 60%),
+      linear-gradient(rgba(125,108,87,.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125,108,87,.07) 1px, transparent 1px),
+      radial-gradient(ellipse at 50% 35%, #f5eddc 0%, #f1e8d8 72%);
     background-size:auto,auto,44px 44px,44px 44px,auto;
   }
-  ::selection{background:var(--gold); color:#0b0e18}
+  ::selection{background:#b85c33; color:#faf4e8}
   a:focus-visible, button:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
 
   .wrap{max-width:1180px; margin:0 auto; padding:0 24px}
@@ -47,29 +49,29 @@
     padding:22px 0 6px;
   }
   .wordmark{
-    font-size:11px; font-weight:600; letter-spacing:.32em; text-transform:uppercase; color:var(--dim);
+    font-family:"Bricolage Grotesque","Inter",sans-serif;
+    font-size:17px; font-weight:700; letter-spacing:0; color:var(--ink); margin:0;
   }
-  .wordmark b{color:var(--gold); font-weight:600}
+  .wordmark b{color:var(--gold); font-weight:700}
   .topbar .free{
-    font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--gold);
-    border:1px solid rgba(255,209,102,.4); border-radius:999px; padding:6px 12px;
-    background:rgba(255,209,102,.06);
+    font-size:12px; font-weight:600; letter-spacing:.01em; color:var(--gold);
+    border:1px solid rgba(184,92,51,.45); border-radius:999px; padding:6px 12px;
+    background:var(--panel);
   }
 
   /* ---------- hero ---------- */
   .hero{text-align:center; padding:56px 0 10px}
   .eyebrow{
-    font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--gold);
+    font-size:12px; font-weight:600; letter-spacing:.01em; color:var(--gold);
     margin:0 0 18px;
   }
   .hero h1{
-    font-family:"Fraunces",Georgia,serif; font-weight:700; letter-spacing:-0.01em;
-    font-size:clamp(3rem, 8vw, 5.6rem); line-height:1.02; margin:0;
-    background:linear-gradient(180deg,#fff8e6 10%, var(--gold) 58%, var(--gold-deep));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
+    font-family:"Bricolage Grotesque","Inter",sans-serif; font-weight:700; letter-spacing:-0.01em;
+    font-size:clamp(3rem, 8vw, 5.6rem); line-height:1.02; margin:0; color:var(--ink);
   }
+  .hero h1 span{color:var(--gold)}
   .hero .tagline{
-    max-width:640px; margin:22px auto 0; color:#c3cff2;
+    max-width:640px; margin:22px auto 0; color:var(--soft);
     font-size:clamp(1rem, 2vw, 1.18rem); line-height:1.65;
   }
   .gold-rule{
@@ -83,8 +85,7 @@
     min-height:34px; display:inline-flex; align-items:center; gap:8px;
     padding:7px 16px; border-radius:999px;
     background:var(--panel); border:1px solid var(--line);
-    backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    box-shadow:0 10px 24px rgba(90,64,32,.10);
     font-size:13px; font-weight:500; color:var(--dim);
   }
   .stats b{color:var(--gold); font-size:15px; font-weight:600}
@@ -96,16 +97,16 @@
   }
   .btn:hover{transform:translateY(-1px)}
   .btn-primary{
-    background:linear-gradient(135deg, var(--gold), #ffdf96); color:#0b0e18; border:1px solid transparent;
-    box-shadow:0 6px 18px rgba(255,209,102,.45); font-weight:600;
+    background:var(--gold); color:#faf4e8; border:1px solid transparent;
+    box-shadow:0 8px 20px rgba(184,92,51,.35); font-weight:600;
   }
-  .btn-ghost{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10); color:var(--ink)}
-  .btn-ghost:hover{border-color:var(--gold)}
+  .btn-ghost{background:#fffdf6; border:1px solid var(--line); color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--gold); color:var(--gold)}
 
   /* ---------- board cards ---------- */
   .section-head{margin:64px 0 8px; text-align:center}
   .section-head h2{
-    font-family:"Fraunces",Georgia,serif; font-weight:600; letter-spacing:-0.01em;
+    font-family:"Bricolage Grotesque","Inter",sans-serif; font-weight:600; letter-spacing:-0.01em;
     font-size:clamp(1.7rem, 3.4vw, 2.4rem); margin:0 0 8px;
   }
   .section-head p{color:var(--dim); margin:0; font-size:.95rem}
@@ -117,25 +118,24 @@
     --acc:var(--gold);
     display:flex; flex-direction:column; gap:10px; text-decoration:none; color:var(--ink);
     background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:22px;
-    backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 18px 50px rgba(0,0,0,.45);
+    box-shadow:0 18px 40px rgba(90,64,32,.14);
     border-top:3px solid var(--acc);
     transition:transform 180ms ease-out, border-color 180ms ease-out, box-shadow 180ms ease-out;
   }
   .card:hover{transform:translateY(-3px); border-color:color-mix(in srgb, var(--acc) 55%, transparent)}
   .card .wing{
-    font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--acc); margin:0;
+    font-size:12px; font-weight:600; letter-spacing:.01em; color:var(--acc); margin:0;
   }
   .card h3{
-    font-family:"Fraunces",Georgia,serif; font-weight:600; letter-spacing:-0.01em;
+    font-family:"Bricolage Grotesque","Inter",sans-serif; font-weight:600; letter-spacing:-0.01em;
     font-size:1.45rem; margin:0;
   }
   .card .chip{
-    align-self:flex-start; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11.5px;
+    align-self:flex-start; font-family:"Inter",sans-serif; font-size:11.5px; font-weight:500;
     color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:4px 10px;
-    background:rgba(255,255,255,.03);
+    background:var(--panel-alt);
   }
-  .card .pitch{color:#c3cff2; font-size:.92rem; line-height:1.6; margin:0; flex:1}
+  .card .pitch{color:var(--soft); font-size:.92rem; line-height:1.6; margin:0; flex:1}
   .card .enter{
     font-size:13px; font-weight:600; color:var(--acc); margin-top:4px;
   }
@@ -148,13 +148,12 @@
   }
   .step{
     background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:22px;
-    backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 18px 50px rgba(0,0,0,.45);
+    box-shadow:0 18px 40px rgba(90,64,32,.14);
   }
   .step .num{
-    font-family:"Fraunces",Georgia,serif; font-size:1.9rem; font-weight:700; color:var(--gold); margin:0 0 6px;
+    font-family:"Bricolage Grotesque","Inter",sans-serif; font-size:1.9rem; font-weight:700; color:var(--gold); margin:0 0 6px;
   }
-  .step h3{font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:1.15rem; margin:0 0 8px; letter-spacing:-0.01em}
+  .step h3{font-family:"Bricolage Grotesque","Inter",sans-serif; font-weight:600; font-size:1.15rem; margin:0 0 8px; letter-spacing:-0.01em}
   .step p{color:var(--dim); font-size:.9rem; line-height:1.6; margin:0}
 
   /* ---------- footer ---------- */
@@ -162,7 +161,7 @@
     margin:72px 0 0; padding:28px 0 40px; border-top:1px solid var(--line);
     color:var(--dim); font-size:.85rem; line-height:1.7; text-align:center;
   }
-  footer .fine{max-width:720px; margin:8px auto 0; font-size:.78rem; color:#6f79a0}
+  footer .fine{max-width:720px; margin:8px auto 0; font-size:.78rem; color:#a08b6d}
 
   @media (max-width:640px){
     .wrap{padding:0 14px}
@@ -181,20 +180,20 @@
 
 <div class="wrap">
   <div class="topbar">
-    <p class="wordmark">Circuit<b>Lab</b> 3D</p>
-    <span class="free">100% free · No sign-up</span>
+    <p class="wordmark">Circuit<b>Lab</b> <span>3D</span></p>
+    <span class="free">Free forever, no sign-up</span>
   </div>
 
   <header class="hero">
     <p class="eyebrow">An interactive electronics lab for ECE students</p>
-    <h1>CircuitLab 3D</h1>
-    <p class="tagline">Learn Arduino, breadboard circuits and Raspberry Pi the hands-on way — explore real boards in interactive 3D, follow the wiring pin by pin, then press Run and watch your circuit come alive. No hardware, no installs, no cost.</p>
+    <h1>CircuitLab <span>3D</span></h1>
+    <p class="tagline">Learn Arduino, breadboard circuits and Raspberry Pi the hands-on way: explore real boards in interactive 3D, follow the wiring pin by pin, then press Run and watch your circuit come alive. No hardware, no installs, no cost.</p>
     <hr class="gold-rule">
     <ul class="stats">
       <li><b>6</b> boards</li>
       <li><b>1</b> breadboard lab</li>
-      <li><b>38</b> lessons</li>
-      <li><b>100%</b> free</li>
+      <li><b>43</b> lessons</li>
+      <li>Free forever</li>
     </ul>
     <div class="cta-row">
       <a class="btn btn-primary" href="#boards">Browse the boards</a>
@@ -211,57 +210,57 @@
 
     <div class="cards">
       <a class="card" href="uno/" style="--acc:#2fb3c9">
-        <p class="wing">Board 01 · Arduino</p>
+        <p class="wing">Arduino</p>
         <h3>Arduino Uno R3</h3>
-        <span class="chip">ATmega328P · 16 MHz</span>
-        <p class="pitch">The classic first board. Blinking LEDs, buttons, sensors and servos — the friendliest place to start electronics.</p>
+        <span class="chip">ATmega328P, 16 MHz</span>
+        <p class="pitch">The classic first board. Blinking LEDs, buttons, sensors and servos, the friendliest place to start electronics.</p>
         <span class="enter">Enter lab <span>→</span></span>
       </a>
 
       <a class="card" href="nano/" style="--acc:#37c98a">
-        <p class="wing">Board 02 · Arduino</p>
+        <p class="wing">Arduino</p>
         <h3>Arduino Nano</h3>
-        <span class="chip">ATmega328P · 16 MHz</span>
+        <span class="chip">ATmega328P, 16 MHz</span>
         <p class="pitch">Uno power in a breadboard-friendly stick. Plug it straight into a breadboard and build compact, tidy circuits.</p>
         <span class="enter">Enter lab <span>→</span></span>
       </a>
 
       <a class="card" href="mega/" style="--acc:#7d8cff">
-        <p class="wing">Board 03 · Arduino</p>
+        <p class="wing">Arduino</p>
         <h3>Arduino Mega 2560</h3>
-        <span class="chip">ATmega2560 · 16 MHz</span>
-        <p class="pitch">54 digital pins, 16 analog inputs and four serial ports — the board for robots, printers and big ambitious builds.</p>
+        <span class="chip">ATmega2560, 16 MHz</span>
+        <p class="pitch">54 digital pins, 16 analog inputs and four serial ports: the board for robots, printers and big ambitious builds.</p>
         <span class="enter">Enter lab <span>→</span></span>
       </a>
 
       <a class="card" href="esp32/" style="--acc:#ff9f5a">
-        <p class="wing">Board 04 · Espressif</p>
+        <p class="wing">Espressif</p>
         <h3>ESP32 DevKit</h3>
-        <span class="chip">ESP32 · 240 MHz · Wi-Fi + Bluetooth</span>
+        <span class="chip">ESP32, 240 MHz, Wi-Fi + Bluetooth</span>
         <p class="pitch">A dual-core powerhouse with wireless built in. Touch pins, PWM everywhere, and your first steps into the IoT.</p>
         <span class="enter">Enter lab <span>→</span></span>
       </a>
 
       <a class="card" href="pico/" style="--acc:#e5537a">
-        <p class="wing">Board 05 · Raspberry Pi</p>
+        <p class="wing">Raspberry Pi</p>
         <h3>Raspberry Pi Pico</h3>
-        <span class="chip">RP2040 · 133 MHz</span>
+        <span class="chip">RP2040, 133 MHz</span>
         <p class="pitch">Raspberry Pi's own microcontroller: dual cores, programmable PIO state machines, and C/C++ or MicroPython.</p>
         <span class="enter">Enter lab <span>→</span></span>
       </a>
 
       <a class="card" href="pi4/" style="--acc:#c95b5b">
-        <p class="wing">Board 06 · Raspberry Pi</p>
+        <p class="wing">Raspberry Pi</p>
         <h3>Raspberry Pi 4</h3>
-        <span class="chip">BCM2711 · quad-core Linux</span>
+        <span class="chip">BCM2711, quad-core Linux</span>
         <p class="pitch">A full Linux computer the size of a credit card. Explore the 40-pin GPIO header that bridges code and circuits.</p>
         <span class="enter">Enter lab <span>→</span></span>
       </a>
 
       <a class="card" href="breadboard/" style="--acc:#ffd166">
-        <p class="wing">Lab · Circuits</p>
+        <p class="wing">Circuits lab</p>
         <h3>Breadboard Lab</h3>
-        <span class="chip">830 tie-points · solderless</span>
+        <span class="chip">830 tie-points, solderless</span>
         <p class="pitch">Where every circuit begins. Learn rails, rows and jumper wires, then build working circuits with no board at all.</p>
         <span class="enter">Enter lab <span>→</span></span>
       </a>
@@ -287,7 +286,7 @@
       <div class="step">
         <p class="num">3</p>
         <h3>Run the simulation</h3>
-        <p>Press Run and watch LEDs light, motors turn and readings stream into the serial monitor — then tweak the code and run it again.</p>
+        <p>Press Run and watch LEDs light, motors turn and readings stream into the serial monitor, then tweak the code and run it again.</p>
       </div>
     </div>
   </section>

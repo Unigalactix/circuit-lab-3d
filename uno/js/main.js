@@ -10,4 +10,4 @@ const raw = window.PIN_SETS['uno'];
 const pins = Array.isArray(raw) ? raw : raw.pins;
 const lessons = window.LESSON_SETS['uno'];
 
-initLab({ boardId: 'uno', accent: '#2dd4bf', lessons, pins });
+initLab({ boardId: 'uno', accent: '#c05f33', lessons, pins });

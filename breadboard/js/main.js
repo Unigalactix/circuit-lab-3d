@@ -19,7 +19,7 @@ const lessons = (window.LESSON_SETS && Array.isArray(window.LESSON_SETS['breadbo
 
 initLab({
   boardId: 'breadboard',
-  accent: '#fde047',
+  accent: '#bd8f2e',
   lessons,
   pins,
 });

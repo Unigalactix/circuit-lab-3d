@@ -20,4 +20,4 @@ if (raw && raw.note) {
   }
 }
 
-initLab({ boardId: 'pi4', accent: '#fb7185', lessons, pins });
+initLab({ boardId: 'pi4', accent: '#a03a44', lessons, pins });

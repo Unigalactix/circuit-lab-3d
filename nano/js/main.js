@@ -10,4 +10,4 @@ const raw = window.PIN_SETS['nano'];
 const pins = Array.isArray(raw) ? raw : raw.pins;
 const lessons = window.LESSON_SETS['nano'];
 
-initLab({ boardId: 'nano', accent: '#38bdf8', lessons, pins });
+initLab({ boardId: 'nano', accent: '#cf9432', lessons, pins });

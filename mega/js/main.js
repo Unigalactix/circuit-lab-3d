@@ -10,4 +10,4 @@ const raw = window.PIN_SETS['mega'];
 const pins = Array.isArray(raw) ? raw : raw.pins;
 const lessons = window.LESSON_SETS['mega'];
 
-initLab({ boardId: 'mega', accent: '#a78bfa', lessons, pins });
+initLab({ boardId: 'mega', accent: '#77873f', lessons, pins });
